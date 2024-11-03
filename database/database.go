@@ -29,10 +29,4 @@ func Database() {
 	}
 
 	fmt.Println("Successfully connected to the database")
-
-	sqlDB, err := DB.DB()
-	if err != nil {
-		log.Fatalf("Failed to access the underlying sql.DB: %v", err)
-	}
-	defer sqlDB.Close()
 }
