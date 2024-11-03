@@ -55,3 +55,22 @@ func CreateUser(ctx *fiber.Ctx) error {
 		"data":    newUser,
 	})
 }
+
+func GetUserById(ctx *fiber.Ctx) error {
+	userId := ctx.Params("id")
+
+	var user entity.User
+
+	err := database.DB.First(&user, "id = ?", userId).Error
+
+	if err != nil {
+		return ctx.Status(404).JSON(fiber.Map{
+			"message": "user not found",
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "success",
+		"data":    user,
+	})
+}
