@@ -81,7 +81,7 @@ func UpdateUser(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(userRequest); err != nil {
 		return ctx.Status(400).JSON(
 			fiber.Map{
-				"message": "failed",
+				"message": "bad request",
 				"error":   err.Error(),
 			},
 		)
@@ -100,6 +100,43 @@ func UpdateUser(ctx *fiber.Ctx) error {
 	user.Name = userRequest.Name
 	user.Address = userRequest.Address
 	user.Phone = userRequest.Phone
+	user.Email = userRequest.Email
+
+	errUpdate := database.DB.Save(user).Error
+	if errUpdate != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"message": "failed",
+			"error":   errUpdate,
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "success",
+		"data":    user,
+	})
+}
+
+func UpdateUserEmail(ctx *fiber.Ctx) error {
+	userRequest := new(request.UserEmailRequest)
+	if err := ctx.BodyParser(userRequest); err != nil {
+		return ctx.Status(400).JSON(
+			fiber.Map{
+				"message": "bad request",
+				"error":   err.Error(),
+			},
+		)
+	}
+
+	userId := ctx.Params("id")
+
+	var user entity.User
+
+	errFind := database.DB.First(&user, "id = ?", userId).Error
+	if errFind != nil {
+		return ctx.Status(404).JSON(fiber.Map{
+			"message": "user not found",
+		})
+	}
 	user.Email = userRequest.Email
 
 	errUpdate := database.DB.Save(user).Error
