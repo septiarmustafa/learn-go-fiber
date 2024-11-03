@@ -10,4 +10,5 @@ func RouteInit(r *fiber.App) {
 	r.Get("/user", handler.GetAllUser)
 	r.Post("/user", handler.CreateUser)
 	r.Get("/user/:id", handler.GetUserById)
+	r.Put("/user/:id", handler.UpdateUser)
 }

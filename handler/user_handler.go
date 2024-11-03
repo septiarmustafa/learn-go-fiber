@@ -74,3 +74,44 @@ func GetUserById(ctx *fiber.Ctx) error {
 		"data":    user,
 	})
 }
+
+func UpdateUser(ctx *fiber.Ctx) error {
+
+	userRequest := new(request.UserRequest)
+	if err := ctx.BodyParser(userRequest); err != nil {
+		return ctx.Status(400).JSON(
+			fiber.Map{
+				"message": "failed",
+				"error":   err.Error(),
+			},
+		)
+	}
+
+	userId := ctx.Params("id")
+
+	var user entity.User
+
+	errFind := database.DB.First(&user, "id = ?", userId).Error
+	if errFind != nil {
+		return ctx.Status(404).JSON(fiber.Map{
+			"message": "user not found",
+		})
+	}
+	user.Name = userRequest.Name
+	user.Address = userRequest.Address
+	user.Phone = userRequest.Phone
+	user.Email = userRequest.Email
+
+	errUpdate := database.DB.Save(user).Error
+	if errUpdate != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"message": "failed",
+			"error":   errUpdate,
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "success",
+		"data":    user,
+	})
+}
